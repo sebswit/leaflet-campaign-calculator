@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaflet Campaign Calculator | UK Marketing Agency</title>
+  <meta name="description" content="Instant estimate calculator for UK leaflet design, printing, and door-to-door distribution campaigns.">
+  
+  <!-- Modern Typography (Plus Jakarta Sans & Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Background Ambient Glow -->
+  <div class="ambient-glow glow-top-left" aria-hidden="true"></div>
+  <div class="ambient-glow glow-bottom-right" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="container header-content">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">Leaflet Campaign Calculator</h1>
+          <p class="brand-subtitle">Agency Campaign Cost & Production Estimator</p>
+        </div>
+      </div>
+
+      <!-- VAT Mode Switcher -->
+      <div class="vat-control-group" role="group" aria-label="Tax display settings">
+        <span class="vat-label" id="vat-toggle-label">Pricing Display:</span>
+        <div class="toggle-pill" id="vatTogglePill">
+          <button type="button" class="pill-btn active" id="btnExVat" aria-pressed="true">Ex. VAT</button>
+          <button type="button" class="pill-btn" id="btnIncVat" aria-pressed="false">Inc. 20% VAT</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Application Body -->
+  <main class="main-content">
+    <div class="container">
+      <div class="calculator-grid">
+        
+        <!-- Left: Configuration Form -->
+        <div class="config-panel">
+
+          <!-- 1. Leaflet Quantity -->
+          <section class="calc-section" aria-labelledby="heading-quantity">
+            <div class="section-header">
+              <span class="step-badge">1</span>
+              <div>
+                <h2 id="heading-quantity" class="section-title">Number of Leaflets</h2>
+                <p class="section-desc">Select a standard campaign tier or enter a custom volume.</p>
+              </div>
+            </div>
+
+            <!-- Presets -->
+            <div class="quantity-presets" role="radiogroup" aria-label="Leaflet quantity preset selection">
+              <button type="button" class="preset-btn" data-quantity="500">500</button>
+              <button type="button" class="preset-btn active" data-quantity="1000">1,000</button>
+              <button type="button" class="preset-btn" data-quantity="2500">2,500</button>
+              <button type="button" class="preset-btn" data-quantity="5000">5,000</button>
+              <button type="button" class="preset-btn" data-quantity="custom">Custom</button>
+            </div>
+
+            <!-- Custom Quantity Input Container -->
+            <div class="custom-quantity-wrap" id="customQuantityWrap" hidden>
+              <label for="customQuantityInput" class="custom-input-label">Enter exact quantity:</label>
+              <div class="input-with-affix">
+                <input 
+                  type="number" 
+                  id="customQuantityInput" 
+                  class="custom-number-input" 
+                  placeholder="e.g. 3,500" 
+                  min="100" 
+                  max="250000" 
+                  step="50"
+                  aria-describedby="customQtyHint"
+                />
+                <span class="input-unit">leaflets</span>
+              </div>
+              <p class="input-hint" id="customQtyHint">Minimum 100 units. Volume discount tiers automatically applied.</p>
+            </div>
+          </section>
+
+          <!-- 2. Leaflet Design Selection -->
+          <section class="calc-section" aria-labelledby="heading-design">
+            <div class="section-header">
+              <span class="step-badge">2</span>
+              <div>
+                <h2 id="heading-design" class="section-title">Leaflet Design & Artwork</h2>
+                <p class="section-desc">Select artwork preparation level or full creative service.</p>
+              </div>
+            </div>
+
+            <div class="design-options-grid" id="designOptionsContainer" role="radiogroup" aria-label="Design options">
+              <!-- Dynamically populated from CONFIG.designOptions -->
+            </div>
+          </section>
+
+          <!-- 3. Printing Production -->
+          <section class="calc-section" aria-labelledby="heading-printing">
+            <div class="section-header-row">
+              <div class="section-header">
+                <span class="step-badge">3</span>
+                <div>
+                  <h2 id="heading-printing" class="section-title">Print Production</h2>
+                  <p class="section-desc">A5 Double-Sided · 170gsm Silk Paper · Full Colour</p>
+                </div>
+              </div>
+              
+              <!-- Switch toggle -->
+              <label class="switch-container" for="togglePrinting">
+                <span class="switch-status-label" id="printingStatusLabel">Included</span>
+                <input type="checkbox" id="togglePrinting" checked aria-labelledby="heading-printing" />
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <div class="feature-card" id="printingFeatureCard">
+              <div class="feature-info">
+                <div class="feature-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                  </svg>
+                </div>
+                <div>
+                  <p class="feature-title">High Quality Commercial Print</p>
+                  <p class="feature-subtitle" id="printingSpecNote">Standard A5 170gsm Silk (Temporary editable prices in config.js)</p>
+                </div>
+              </div>
+              <div class="feature-cost-badge">
+                <span class="cost-prefix">Print Cost:</span>
+                <span class="cost-value" id="cardPrintingCost">£62.00</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- 4. Distribution -->
+          <section class="calc-section" aria-labelledby="heading-distribution">
+            <div class="section-header-row">
+              <div class="section-header">
+                <span class="step-badge">4</span>
+                <div>
+                  <h2 id="heading-distribution" class="section-title">Door-to-Door Distribution</h2>
+                  <p class="section-desc">Targeted household delivery across designated postcodes</p>
+                </div>
+              </div>
+              
+              <!-- Switch toggle -->
+              <label class="switch-container" for="toggleDistribution">
+                <span class="switch-status-label" id="distributionStatusLabel">Included</span>
+                <input type="checkbox" id="toggleDistribution" checked aria-labelledby="heading-distribution" />
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <div class="feature-card" id="distributionFeatureCard">
+              <div class="feature-info">
+                <div class="feature-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="3" width="15" height="13"></rect>
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                  </svg>
+                </div>
+                <div>
+                  <p class="feature-title">Solus / Targeted Delivery</p>
+                  <p class="feature-subtitle" id="distributionRateNote">Minimum delivery charge £139.00 up to 1,000 leaflets</p>
+                </div>
+              </div>
+              <div class="feature-cost-badge">
+                <span class="cost-prefix">Delivery Cost:</span>
+                <span class="cost-value" id="cardDistributionCost">£139.00</span>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- Right: Sticky Live Summary & Quote Card -->
+        <aside class="summary-panel" aria-label="Campaign Cost Estimate Summary">
+          <div class="quote-card sticky-card">
+            
+            <div class="quote-card-header">
+              <div>
+                <span class="agency-tag">Agency Estimate</span>
+                <h3 class="quote-title">Campaign Summary</h3>
+              </div>
+              <span class="badge-live-pulse" title="Calculates automatically as you make changes">
+                <span class="pulse-dot"></span> Live Quote
+              </span>
+            </div>
+
+            <!-- Campaign Meta Pills -->
+            <div class="campaign-meta-pills">
+              <span class="meta-pill" id="summaryQtyPill">1,000 Leaflets</span>
+              <span class="meta-pill" id="summaryVatModePill">Figures Ex. VAT</span>
+            </div>
+
+            <!-- Line Items Breakdown -->
+            <div class="line-items-list">
+              
+              <!-- Design Item -->
+              <div class="line-item" id="itemDesignRow">
+                <div class="line-item-desc">
+                  <span class="line-item-title">1. Design & Pre-Press</span>
+                  <span class="line-item-sub" id="summaryDesignName">Print-ready artwork</span>
+                </div>
+                <div class="line-item-cost" id="summaryDesignCost">£0.00</div>
+              </div>
+
+              <!-- Printing Item -->
+              <div class="line-item" id="itemPrintingRow">
+                <div class="line-item-desc">
+                  <span class="line-item-title">2. Print Production</span>
+                  <span class="line-item-sub" id="summaryPrintingSub">1,000 copies (A5 Silk)</span>
+                </div>
+                <div class="line-item-cost" id="summaryPrintingCost">£62.00</div>
+              </div>
+
+              <!-- Distribution Item -->
+              <div class="line-item" id="itemDistributionRow">
+                <div class="line-item-desc">
+                  <span class="line-item-title">3. Household Distribution</span>
+                  <span class="line-item-sub" id="summaryDistributionSub">1,000 leaflets (Min. delivery charge)</span>
+                </div>
+                <div class="line-item-cost" id="summaryDistributionCost">£139.00</div>
+              </div>
+
+            </div>
+
+            <!-- Totals Divider -->
+            <div class="quote-divider"></div>
+
+            <!-- Subtotals & VAT Breakdown -->
+            <div class="subtotals-wrap">
+              <div class="subtotal-row">
+                <span class="subtotal-label">Subtotal (Ex. VAT)</span>
+                <span class="subtotal-val" id="summarySubtotalExVat">£201.00</span>
+              </div>
+              
+              <div class="subtotal-row vat-row" id="summaryVatRow">
+                <span class="subtotal-label">UK VAT (20%)</span>
+                <span class="subtotal-val" id="summaryVatAmount">£40.20</span>
+              </div>
+            </div>
+
+            <!-- Primary Total Highlight Box -->
+            <div class="total-highlight-box">
+              <div class="total-header">
+                <span class="total-label" id="primaryTotalLabel">Total Campaign Cost (Ex. VAT)</span>
+                <span class="total-unit-badge" id="summaryUnitCostBadge">20.1p / leaflet</span>
+              </div>
+              <div class="total-amount-display" id="primaryTotalAmount">£201.00</div>
+              
+              <!-- Secondary reference label for VAT clarity -->
+              <p class="total-secondary-note" id="totalSecondaryNote">
+                Total Inc. 20% VAT: <strong id="secondaryIncVatTotal">£241.20</strong>
+              </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="quote-actions">
+              <button type="button" class="btn-primary" id="btnCopyQuote">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy Quote Summary
+              </button>
+
+              <button type="button" class="btn-secondary" id="btnPrintQuote">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                  <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                Print / Export PDF
+              </button>
+            </div>
+
+            <!-- Agency Micro Notes -->
+            <div class="quote-footer-notes">
+              <p>Rates and pricing formulas can be adjusted in <code class="code-ref">js/config.js</code>.</p>
+            </div>
+
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast Notification for Quick Copy -->
+  <div class="toast-notification" id="copyToast" role="alert" aria-live="assertive" hidden>
+    <div class="toast-content">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <div>
+        <strong class="toast-title">Quote Copied to Clipboard</strong>
+        <p class="toast-desc">Formatted campaign breakdown ready to paste into client email.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
